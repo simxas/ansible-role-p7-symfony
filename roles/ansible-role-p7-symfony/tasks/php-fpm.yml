@@ -1,0 +1,21 @@
+---
+
+- name: Enable/Autostart php-fpm
+  service:
+    name: php-fpm
+    state: started
+    enabled: yes
+
+- name: Replace lines in www.conf
+  lineinfile:
+    path: /etc/php-fpm.d/www.conf
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^listen = 127.0.0.1:9000', line: 'listen = /var/run/php-fpm/php7.1-fpm.sock' }
+    - { regexp: '^user = apache', line: 'user = nginx' }
+    - { regexp: '^group = apache', line: 'group = nginx' }
+    - { regexp: '^;listen.owner = nobody', line: 'listen.owner = nginx' }
+    - { regexp: '^;listen.group = nobody', line: 'listen.group = nginx' }
+  notify:
+    - restart php-fpm

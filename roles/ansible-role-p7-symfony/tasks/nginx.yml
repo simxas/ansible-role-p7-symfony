@@ -1,0 +1,37 @@
+---
+
+- name: Install Nginx
+  yum:
+    name: nginx
+    state: latest
+  register: nginx_installed
+
+- name: Add/Change Nginx Main Configuration
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0755
+  notify:
+    - restart nginx
+
+- name: Enable/Autostart Nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+
+- name: Change Permissions of /var/www directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+    owner: nginx
+    group: nginx
+  with_items:
+    - /var/www
+
+- name: Check Nginx Running
+  command: /bin/true
+  notify: started nginx

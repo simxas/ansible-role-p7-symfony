@@ -1,0 +1,26 @@
+---
+composer_path: /usr/local/bin/composer
+composer_keep_updated: false
+composer_version: ''
+
+# The directory where global packages will be installed.
+composer_home_path: '~/.composer'
+composer_home_owner: root
+composer_home_group: root
+
+# A list of packages to install globally.
+composer_global_packages: []
+
+composer_add_to_path: true
+
+# Add a project vendor/bin directory to the PATH
+composer_add_project_to_path: false
+composer_project_path: /path/to/project/vendor/bin
+
+
+
+#===================
+# temporarily
+#===================
+mysql_new_root_password: '4mrjDkNPS#Vem9ozZzEm*ncu'
+mysql_log_error: '/var/log/mysqld.log'

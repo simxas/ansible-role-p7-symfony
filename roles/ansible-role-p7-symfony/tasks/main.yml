@@ -1,0 +1,60 @@
+---
+
+- name: Remote Server
+  debug:  
+    msg: "Remote server: {{ inventory_hostname }}"
+
+- name: Install Latest Updates
+  yum:
+    name: "*"
+    state: latest
+  tags:
+    - bootstrap
+
+- include: php-packages.yml
+  tags:
+    - bootstrap
+    - php-packages
+
+- include: other-packages.yml
+  tags:
+    - bootstrap
+    - other-packages
+
+- include: php-changes.yml
+  tags:
+    - bootstrap
+    - php-changes
+    
+- include: php-fpm.yml
+  tags:
+    - bootstrap
+    - php-fpm
+
+- include: nginx.yml
+  tags:
+    - bootstrap
+    - nginx
+
+- include: composer.yml
+  tags:
+    - bootstrap
+    - composer
+
+- include: symfony.yml
+  tags:
+    - bootstrap
+    - symfony
+
+- include: firewalld.yml
+  tags:
+    - bootstrap
+    - firewalld
+
+- include: mysql.yml
+  tags:
+    - mysql
+
+- include: mysql_secure_installation.yml
+  tags:
+    - mysql_secure

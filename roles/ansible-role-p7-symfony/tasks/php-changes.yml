@@ -1,0 +1,34 @@
+---
+
+- name: Change PHP timezone
+  lineinfile:
+    dest: /etc/php.ini
+    regexp: "^.?date.timezone"
+    line: "date.timezone = Europe/Vilnius"
+    state: present
+
+- name: Change PHP max_execution_time
+  lineinfile:
+    dest: /etc/php.ini
+    regexp: "^max_execution_time"
+    line: "max_execution_time = 30"
+    state: present
+
+- name: Change PHP memory_limit
+  lineinfile:
+    dest: /etc/php.ini
+    regexp: "^.?memory_limit"
+    line: "memory_limit = 512M"
+    state: present
+
+- name: Change PHP short_open_tag
+  lineinfile:
+    dest: /etc/php.ini
+    regexp: "^.?short_open_tag"
+    line: "short_open_tag = On"
+    state: present
+
+- name: Restart php-fpm
+  service:
+    name: php-fpm
+    state: restarted

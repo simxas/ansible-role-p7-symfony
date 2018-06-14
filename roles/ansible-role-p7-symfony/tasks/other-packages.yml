@@ -1,0 +1,10 @@
+---
+
+- name: Install other Packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - unzip
+    - wget
+    - git

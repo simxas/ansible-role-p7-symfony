@@ -1,0 +1,15 @@
+[development]
+192.168.1.177
+
+[production]
+
+
+[my-all:children]
+development
+production
+
+[development:vars]
+env=development
+
+[production:vars]
+env=production

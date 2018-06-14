@@ -1,0 +1,20 @@
+---
+
+- name: Check if Composer is installed.
+  stat: "path={{ composer_path }}"
+  register: composer_bin
+
+- name: Check if "project" directory exists.
+  stat:
+    path: /var/www/project
+  register: project_dir
+
+- name: Run Symfony installer.
+  command: >
+    composer create-project symfony/website-skeleton /var/www/project
+  when: composer_bin.stat.exists and not project_dir.stat.exists
+
+- name: Fixing problem with Selinux.
+  shell:  |
+    chcon -R -t httpd_sys_script_rw_t /var/www/project/var/cache/
+    chcon -R -t httpd_sys_script_rw_t /var/www/project/var/log/

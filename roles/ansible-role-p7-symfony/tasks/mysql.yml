@@ -1,0 +1,21 @@
+---
+
+- name: Install MySQLdb Python package for secure installations.
+  yum: 
+    name: MySQL-python 
+    state: present
+
+- name: Install REMI Repository
+  yum:
+    name: http://www.percona.com/downloads/percona-release/redhat/0.1-4/percona-release-0.1-4.noarch.rpm
+    state: present
+  register: remi_installed
+
+- name: Install MySQL client
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - Percona-Server-server-57
+  notify:
+    - started mysql

@@ -1,0 +1,35 @@
+---
+
+- name: Install/Update EPEL Repository
+  yum:
+    name: epel-release.noarch
+    state: latest
+
+- name: Install/Update YUM Utils
+  yum:
+    name: yum-utils
+    state: latest
+
+- name: Install/Update REMI Repository
+  yum:
+    name: http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    state: present
+  register: remi_installed
+
+- name: Enable PHP 7.1
+  command: "yum-config-manager --enable remi-php71"
+  when: remi_installed is success
+
+- name: Install/Update PHP Packages
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - php
+    - php-common
+    - php-fpm
+    - php-mysqlnd
+    - php-xml
+    - php-xmlrpc
+    - php-mcrypt
+    - php-gd

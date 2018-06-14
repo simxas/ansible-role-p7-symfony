@@ -1,0 +1,87 @@
+---
+
+# - name: Pause
+#   pause:
+#     seconds: 30
+
+- name: Acquire temporary root pass
+  shell: > 
+    awk -F': ' '$0 ~ "temporary password"{print $2}' {{ mysql_log_error }}
+  register: mysql_root_temp_password
+
+- name: Set temp root pass as root password
+  set_fact:
+    mysql_root_password: "{{ mysql_root_temp_password.stdout }}"
+  when: mysql_root_temp_password is defined
+
+- name: PRINT mysql_root_password
+  debug:
+    var: mysql_root_password
+  when: mysql_root_temp_password is defined
+
+# create root .my.cnf config file
+- name: Add .my.cnf
+  template: 
+    src: my.cnf.j2 
+    dest: /root/.my.cnf 
+    owner: root 
+    group: root 
+    mode: 0600
+
+# Set root password
+# UPDATE mysql.user SET Password=PASSWORD('mysecret') WHERE User='root';
+# FLUSH PRIVILEGES;
+
+# - name: Set root Password
+#   # mysql_user: login_password={{ mysql_root_password }} check_implicit_admin=yes name=root host={{ item }} password={{ mysql_root_password }} state=present
+#   mysql_user: login_user=root login_password={{ mysql_root_password }} name=root host={{ item }} password={{ mysql_new_root_password }} priv=*.*:ALL,GRANT
+#   with_items:
+#     - localhost
+#     - 127.0.0.1
+#     - ::1
+
+- name: "MySQL: mysql_user: update mysql root password for all root accounts"
+  mysql_user:
+    name: root
+    host: "{{item}}"
+    password: "{{mysql_root_password}}"
+    priv: ".:ALL,GRANT"
+    login_user: root
+    login_password: ""
+  state: present
+  with_items:
+    - "{{default_fqdn}}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: Reload privilege tables
+  command: 'mysql -ne "{{ item }}"'
+  with_items:
+    - FLUSH PRIVILEGES
+  changed_when: False
+
+- name: Remove anonymous users
+  command: 'mysql -ne "{{ item }}"'
+  with_items:
+    - DELETE FROM mysql.user WHERE User=''
+  changed_when: False
+
+- name: Disallow root login remotely
+  command: 'mysql -ne "{{ item }}"'
+  with_items:
+    - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
+  changed_when: False
+
+- name: Remove test database and access to it
+  command: 'mysql -ne "{{ item }}"'
+  with_items:
+    - DROP DATABASE IF EXISTS test
+    - DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'
+  changed_when: False
+
+- name: Reload privilege tables
+  command: 'mysql -ne "{{ item }}"'
+  with_items:
+    - FLUSH PRIVILEGES
+  changed_when: False

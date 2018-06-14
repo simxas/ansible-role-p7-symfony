@@ -1,0 +1,10 @@
+---
+
+- hosts: "my-all"
+  serial: 1
+  vars_files:
+    - "roles/{{ role_path | basename }}/vars/{{ env }}.yml"
+    # - "roles/ansible-role-p7-symfony/vars/development.yml"
+
+  roles:
+     - { role: ansible-role-p7-symfony }
